@@ -3,6 +3,7 @@ package com.onclass.persona.domain.usecase;
 import com.onclass.persona.domain.enums.TechnicalMessage;
 import com.onclass.persona.domain.exceptions.BusinessException;
 import com.onclass.persona.domain.api.PersonaServicePort;
+import com.onclass.persona.domain.model.Persona;
 import com.onclass.persona.domain.spi.BootcampQueryPort;
 import com.onclass.persona.domain.spi.PersonaPersistencePort;
 import com.onclass.persona.domain.spi.ReporteCommandPort;
@@ -46,6 +47,11 @@ public class PersonaUseCase implements PersonaServicePort {
                         ? validarInscripcion(personaId, bootcampIds)
                         : Mono.error(new BusinessException(TechnicalMessage.PERSONA_NO_EXISTE))
                 );
+    }
+
+    @Override
+    public Flux<Persona> obtenerPersonasPorBootcamp(Long bootcampId) {
+        return persistencePort.findPersonasByBootcampId(bootcampId);
     }
 
     private Mono<Void> validarInscripcion(Long personaId, List<Long> nuevosBootcampIds) {

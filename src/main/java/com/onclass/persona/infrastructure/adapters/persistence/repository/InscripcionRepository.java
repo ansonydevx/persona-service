@@ -7,5 +7,6 @@ import reactor.core.publisher.Mono;
 
 public interface InscripcionRepository extends ReactiveCrudRepository<InscripcionEntity, Long> {
     Flux<InscripcionEntity> findByPersonaId(Long personaId);
+    Flux<InscripcionEntity> findByBootcampId(Long bootcampId);
     Mono<Long> countByPersonaId(Long personaId);
 }

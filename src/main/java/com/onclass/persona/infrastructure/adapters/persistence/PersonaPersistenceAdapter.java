@@ -1,5 +1,6 @@
 package com.onclass.persona.infrastructure.adapters.persistence;
 
+import com.onclass.persona.domain.model.Persona;
 import com.onclass.persona.domain.spi.PersonaPersistencePort;
 import com.onclass.persona.infrastructure.adapters.persistence.repository.InscripcionRepository;
 import com.onclass.persona.infrastructure.adapters.persistence.repository.PersonaRepository;
@@ -40,5 +41,18 @@ public class PersonaPersistenceAdapter implements PersonaPersistencePort {
                 .map(bootcampId -> new InscripcionEntity(personaId, bootcampId))
                 .flatMap(inscripcionRepository::save)
                 .then();
+    }
+
+    @Override
+    public Flux<Persona> findPersonasByBootcampId(Long bootcampId) {
+        return inscripcionRepository.findByBootcampId(bootcampId)
+                .map(InscripcionEntity::getPersonaId)
+                .flatMap(personaRepository::findById)
+                .map(entity ->
+                        new Persona(
+                                entity.getId(),
+                                entity.getNombre(),
+                                entity.getEmail()
+                        ));
     }
 }

@@ -32,4 +32,14 @@ public class PersonaHandler {
                 )
                 .then(ServerResponse.ok().build());
     }
+
+    public Mono<ServerResponse> obtenerPersonasPorBootcamp(ServerRequest request) {
+        Long bootcampId = Long.parseLong(request.pathVariable("id"));
+
+        return ServerResponse.ok()
+                .body(
+                        personaServicePort.obtenerPersonasPorBootcamp(bootcampId),
+                        Persona.class
+                );
+    }
 }

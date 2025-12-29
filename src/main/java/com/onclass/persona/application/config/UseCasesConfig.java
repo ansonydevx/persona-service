@@ -3,6 +3,7 @@ package com.onclass.persona.application.config;
 import com.onclass.persona.domain.api.PersonaServicePort;
 import com.onclass.persona.domain.spi.BootcampQueryPort;
 import com.onclass.persona.domain.spi.PersonaPersistencePort;
+import com.onclass.persona.domain.spi.ReporteCommandPort;
 import com.onclass.persona.domain.usecase.PersonaUseCase;
 import com.onclass.persona.infrastructure.adapters.persistence.PersonaPersistenceAdapter;
 import com.onclass.persona.infrastructure.adapters.persistence.repository.InscripcionRepository;
@@ -27,8 +28,9 @@ public class UseCasesConfig {
     @Bean
     public PersonaServicePort personaServicePort(
             PersonaPersistencePort personaPersistencePort,
-            BootcampQueryPort bootcampQueryPort
+            BootcampQueryPort bootcampQueryPort,
+            ReporteCommandPort reporteCommandPort
     ) {
-        return new PersonaUseCase(personaPersistencePort, bootcampQueryPort);
+        return new PersonaUseCase(personaPersistencePort, bootcampQueryPort, reporteCommandPort);
     }
 }

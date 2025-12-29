@@ -5,6 +5,7 @@ import com.onclass.persona.domain.exceptions.BusinessException;
 import com.onclass.persona.domain.api.PersonaServicePort;
 import com.onclass.persona.domain.spi.BootcampQueryPort;
 import com.onclass.persona.domain.spi.PersonaPersistencePort;
+import com.onclass.persona.domain.spi.ReporteCommandPort;
 import com.onclass.persona.infrastructure.entrypoints.dto.BootcampResumen;
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Flux;
@@ -18,13 +19,16 @@ public class PersonaUseCase implements PersonaServicePort {
 
     private final PersonaPersistencePort persistencePort;
     private final BootcampQueryPort bootcampQueryPort;
+    private final ReporteCommandPort reporteCommandPort;
 
     public PersonaUseCase(
             PersonaPersistencePort persistencePort,
-            BootcampQueryPort bootcampQueryPort
+            BootcampQueryPort bootcampQueryPort,
+            ReporteCommandPort reporteCommandPort
     ) {
         this.persistencePort = persistencePort;
         this.bootcampQueryPort = bootcampQueryPort;
+        this.reporteCommandPort = reporteCommandPort;
     }
 
     @Override
@@ -82,7 +86,10 @@ public class PersonaUseCase implements PersonaServicePort {
                     }
 
                     return persistencePort
-                            .saveInscripciones(personaId, nuevosBootcampIds);
+                            .saveInscripciones(personaId, nuevosBootcampIds)
+                            .then(
+                                    reporteCommandPort.incrementarPersonas(nuevosBootcampIds)
+                            );
                 });
     }
 

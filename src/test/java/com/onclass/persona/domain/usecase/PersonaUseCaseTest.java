@@ -4,6 +4,7 @@ import com.onclass.persona.domain.enums.TechnicalMessage;
 import com.onclass.persona.domain.exceptions.BusinessException;
 import com.onclass.persona.domain.spi.BootcampQueryPort;
 import com.onclass.persona.domain.spi.PersonaPersistencePort;
+import com.onclass.persona.domain.spi.ReporteCommandPort;
 import com.onclass.persona.infrastructure.entrypoints.dto.BootcampResumen;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -21,14 +22,16 @@ class PersonaUseCaseTest {
 
     private PersonaPersistencePort persistencePort;
     private BootcampQueryPort bootcampQueryPort;
+    private ReporteCommandPort reporteCommandPort;
     private PersonaUseCase useCase;
 
     @BeforeEach
     void setup() {
         persistencePort = Mockito.mock(PersonaPersistencePort.class);
         bootcampQueryPort = Mockito.mock(BootcampQueryPort.class);
+        reporteCommandPort = Mockito.mock(ReporteCommandPort.class);
 
-        useCase = new PersonaUseCase(persistencePort, bootcampQueryPort);
+        useCase = new PersonaUseCase(persistencePort, bootcampQueryPort, reporteCommandPort);
     }
 
     @Test

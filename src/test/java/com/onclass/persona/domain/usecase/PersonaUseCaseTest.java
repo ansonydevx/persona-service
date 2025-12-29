@@ -66,10 +66,14 @@ class PersonaUseCaseTest {
         when(persistencePort.saveInscripciones(personaId, nuevos))
                 .thenReturn(Mono.empty());
 
+        when(reporteCommandPort.incrementarPersonas(nuevos))
+                .thenReturn(Mono.empty());
+
         StepVerifier.create(useCase.inscribirse(personaId, nuevos))
                 .verifyComplete();
 
         verify(persistencePort).saveInscripciones(personaId, nuevos);
+        verify(reporteCommandPort).incrementarPersonas(nuevos);
     }
 
     @Test

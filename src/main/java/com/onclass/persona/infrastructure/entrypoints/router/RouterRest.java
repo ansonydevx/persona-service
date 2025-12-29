@@ -37,6 +37,7 @@ public class RouterRest {
     public RouterFunction<ServerResponse> routerFunction(PersonaHandler handler) {
         return RouterFunctions.route()
                 .POST("/personas/{id}/inscripciones", handler::inscribirse)
+                .GET("/personas/bootcamps/{id}", handler::obtenerPersonasPorBootcamp)
                 .build();
     }
 }

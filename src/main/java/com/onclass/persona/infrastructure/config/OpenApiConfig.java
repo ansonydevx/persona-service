@@ -9,11 +9,11 @@ import org.springframework.context.annotation.Configuration;
 public class OpenApiConfig {
 
     @Bean
-    public OpenAPI bootcampApi() {
+    public OpenAPI personaApi() {
         return new OpenAPI()
                 .info(new Info()
-                        .title("Bootcamp API")
-                        .description("Gestionar bootcamps")
+                        .title("Persona API")
+                        .description("Gestionar personas")
                         .version("1.0.0"));
     }
 }

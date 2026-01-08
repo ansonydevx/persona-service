@@ -32,6 +32,11 @@ class PersonaUseCaseTest {
         reporteCommandPort = Mockito.mock(ReporteCommandPort.class);
 
         useCase = new PersonaUseCase(persistencePort, bootcampQueryPort, reporteCommandPort);
+
+        when(persistencePort.saveInscripciones(anyLong(), anyList()))
+                .thenReturn(Mono.empty());
+        when(reporteCommandPort.incrementarPersonas(anyList()))
+                .thenReturn(Mono.empty());
     }
 
     @Test
@@ -118,6 +123,12 @@ class PersonaUseCaseTest {
     void deberiaFallarSiSeEnvianMasDe5Bootcamps() {
         Long personaId = 1L;
         List<Long> bootcamps = List.of(1L,2L,3L,4L,5L,6L);
+
+        when(persistencePort.existsPersonaById(personaId))
+                .thenReturn(Mono.just(true));
+
+        when(persistencePort.countInscripciones(personaId))
+                .thenReturn(Mono.just(0L));
 
         StepVerifier.create(useCase.inscribirse(personaId, bootcamps))
                 .expectErrorMatches(e ->

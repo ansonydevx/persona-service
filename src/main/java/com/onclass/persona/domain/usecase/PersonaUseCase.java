@@ -22,6 +22,8 @@ public class PersonaUseCase implements PersonaServicePort {
     private final BootcampQueryPort bootcampQueryPort;
     private final ReporteCommandPort reporteCommandPort;
 
+    private static final int MAXIMO_BOOTCAMPS = 5;
+
     public PersonaUseCase(
             PersonaPersistencePort persistencePort,
             BootcampQueryPort bootcampQueryPort,
@@ -38,14 +40,10 @@ public class PersonaUseCase implements PersonaServicePort {
             return Mono.empty();
         }
 
-        if (bootcampIds.size() > 5) {
-            return Mono.error(new BusinessException(TechnicalMessage.MAXIMO_BOOTCAMPS));
-        }
-
-        return persistencePort.existsPersonaById(personaId)
-                .flatMap(exists -> Boolean.TRUE.equals(exists)
-                        ? validarInscripcion(personaId, bootcampIds)
-                        : Mono.error(new BusinessException(TechnicalMessage.PERSONA_NO_EXISTE))
+        return validarPersonaExiste(personaId)
+                .then(validarInscripcion(personaId, bootcampIds))
+                .then(persistencePort.saveInscripciones(personaId, bootcampIds)
+                        .then(reporteCommandPort.incrementarPersonas(bootcampIds))
                 );
     }
 
@@ -56,12 +54,19 @@ public class PersonaUseCase implements PersonaServicePort {
 
     private Mono<Void> validarInscripcion(Long personaId, List<Long> nuevosBootcampIds) {
         return persistencePort.countInscripciones(personaId)
-                .flatMap(count -> count + nuevosBootcampIds.size() > 5
-                        ? Mono.error(
-                                new BusinessException(
-                                        TechnicalMessage.MAXIMO_BOOTCAMPS))
-                        : validarCruceFechas(personaId, nuevosBootcampIds)
-                );
+                .flatMap(count -> {
+                    if (count + nuevosBootcampIds.size() > MAXIMO_BOOTCAMPS) {
+                        return Mono.error(new BusinessException(TechnicalMessage.MAXIMO_BOOTCAMPS));
+                    }
+                    return validarCruceFechas(personaId, nuevosBootcampIds);
+                });
+    }
+
+    private Mono<Void> validarPersonaExiste(Long personaId) {
+        return persistencePort.existsPersonaById(personaId)
+                .filter(Boolean.TRUE::equals)
+                .switchIfEmpty(Mono.error(new BusinessException(TechnicalMessage.PERSONA_NO_EXISTE)))
+                .then();
     }
 
     private Mono<Void> validarCruceFechas(Long personaId, List<Long> nuevosBootcampIds) {
@@ -91,11 +96,7 @@ public class PersonaUseCase implements PersonaServicePort {
                         }
                     }
 
-                    return persistencePort
-                            .saveInscripciones(personaId, nuevosBootcampIds)
-                            .then(
-                                    reporteCommandPort.incrementarPersonas(nuevosBootcampIds)
-                            );
+                    return Mono.empty();
                 });
     }
 
